@@ -1,17 +1,26 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"tethys-go/internal/adapters/handlers"
+	"tethys-go/internal/core/config"
 	"tethys-go/internal/core/ports"
 	"tethys-go/internal/core/services"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	var pgpool *pgxpool.Pool
+	if err := migration(); err != nil {
+		panic(err)
+	}
+
+	pgpool, err := newPgxPool()
+	if err != nil {
+		panic(err)
+	}
 
 	var state *ports.ApiState = &ports.ApiState{}
 	*state = ports.ApiState{
@@ -26,4 +35,8 @@ func main() {
 	r.Get("user/{id}", restUserHandler.GetUser)
 
 	http.ListenAndServe(":3000", r)
+}
+
+func newPgxPool() (*pgxpool.Pool, error) {
+	return pgxpool.New(context.TODO(), config.Get().PgConfig.GetDSN())
 }

@@ -6,14 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type PgConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Database string
-}
-
 type AppConfig struct {
 	PgConfig PgConfig
 }
@@ -21,7 +13,7 @@ type AppConfig struct {
 var cfg *AppConfig
 var cfgOnce sync.Once
 
-func Cfg() *AppConfig {
+func Get() *AppConfig {
 	cfgOnce.Do(func() {
 		cfg = &AppConfig{
 			PgConfig: loadPgCfg(),
@@ -29,6 +21,7 @@ func Cfg() *AppConfig {
 	})
 	return cfg
 }
+
 func loadPgCfg() PgConfig {
 	var pgCfg PgConfig
 
