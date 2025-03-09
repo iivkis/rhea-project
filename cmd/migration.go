@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"tethys-go/internal/core/config"
 
 	_ "github.com/lib/pq"
@@ -8,11 +10,21 @@ import (
 )
 
 func migration() error {
-	db, err := goose.OpenDBWithDriver("postgres", config.Get().PgConfig.GetDSN())
+	fmt.Println(config.Get().PgConfig.GetDSN())
+
+	db, err := sql.Open("postgres", config.Get().PgConfig.GetDSN())
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	return goose.Up(db, "migrations")
+	if err := db.Ping(); err != nil {
+		return err
+	}
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
+	}
+
+	return goose.Up(db, "/app/migrations")
 }

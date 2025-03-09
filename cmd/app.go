@@ -31,8 +31,8 @@ func main() {
 	restUserHandler := handlers.NewRestUserHandler(state)
 
 	r := chi.NewRouter()
-	r.Post("user", restUserHandler.CreateUser)
-	r.Get("user/{id}", restUserHandler.GetUser)
+	r.Post("/user", restUserHandler.CreateUser)
+	r.Get("/user/{id}", restUserHandler.GetUser)
 
 	http.ListenAndServe(":3000", r)
 }
